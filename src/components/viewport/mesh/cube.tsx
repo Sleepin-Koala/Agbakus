@@ -17,12 +17,19 @@ export function CubeSimple({ X , Y , Z }: { X : number , Y : number ,Z: number})
 
   function onPointerMoves(event: ThreeEvent<PointerEvent>){
     setHoveredFace(event.face!.materialIndex)
-    console.log(event.face!.materialIndex)
   }
 
   return (
-    <mesh onClick={(e) => model.setBoundary({type: "encastrement" , "target": e.face!.normal ,"appui": "face"})}
-      onPointerMove={onPointerMoves} scale={0.01}>
+    // X, Y, Z = coordonnées BACKEND (longueur, largeur, hauteur), en mm.
+    // Plus de scale ici : l'échelle vit dans ModelRoot.
+    // Le mesh est décalé de la moitié car three.js CENTRE la boxGeometry,
+    // alors que le backend place un sommet à l'origine (x,y,z de 0 à dim).
+    // Aucune rotation sur ce mesh : e.face.normal est donc déjà exprimée
+    // dans le repère backend (utilisable directement pour l'encastrement).
+    <mesh
+      position={[X / 2, Y / 2, Z / 2]} //origine
+      onClick={(e) => model.setBoundary({type: "encastrement" , "target": e.face!.normal ,"appui": "face"})}
+      onPointerMove={onPointerMoves}>
       <boxGeometry args={[X, Y, Z]} />
 
       {[0, 1, 2, 3, 4, 5].map((index) => (
