@@ -1,34 +1,37 @@
 // 1. Définition des types de formes disponibles
 export type GeometryType = 'pave' | 'cylindre';
 
+
+
+
 // 2. Interface globale de configuration (Sert souvent pour les formulaires / inputs)
 export interface GeometrySettings {
   type: GeometryType;
-  width: number;   // cube / pavé
-  height: number;  // cube / cylindre
-  depth: number;   // cube / pavé
-  radius: number;  // cylindre / sphère
+  longueur: number;   // cube / pavé
+  hauteur: number;  // cube / cylindre
+  largeur: number;   // cube / pavé
+  rayon: number;  // cylindre / sphère
 }
 
 // 3. Spécifications strictes de chaque type de pièce (Part)
 export interface CubePart {
   type: 'pave';
-  width: number;
-  height: number;
-  depth: number;
+  longueur: number;
+  hauteur: number;
+  largeur: number;
 }
 
 export interface CylinderPart {
   type: 'cylindre';
-  radius: number;
-  height: number;
+  rayon: number;
+  hauteur: number;
 }
 
 
 export const DEFAULT_GEOMETRY_SETTINGS: GeometrySettings = {
   type: "pave",
-  width: 100,
-  height: 100,
-  depth: 100,
-  radius: 50,
+  longueur: 100,
+  hauteur: 100,
+  largeur: 100,
+  rayon: 50,
 };

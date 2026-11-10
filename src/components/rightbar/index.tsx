@@ -2,22 +2,18 @@ import { useEffect, useState } from 'react';
 
 import { useModel } from '../../store/models';
 import { DEFAULT_GEOMETRY_SETTINGS, type GeometrySettings } from '../../types/geometry';
-import type { CurrentWorkState, RightbarProps } from '../types';
 import GeometryPanel from './panels/GeometryPanel';
-import type { Material } from 'three';
 import type { Materiau } from '../../types/material';
 import useCalculs from '../../hooks/useCalculs';
 import MaterialPanel from './panels/MaterialPanel';
 import SupportPanel from './panels/SupportPanel';
 import MeshPanel from './panels/MeshPanel';
+import { useWorkState } from '../../store/modules';
 
-export default function Rightbar({ currentWorkState }: { currentWorkState: CurrentWorkState }) {
-  const [geometrySettings, setGeometrySettings] = useState<GeometrySettings>(DEFAULT_GEOMETRY_SETTINGS);
-  const [materialSettings, setMaterialSettings] = useState<Materiau | null>(null);
-  // const [meshSettings, setMeshSettings] = useState<MeshSettings>(DEFAULT_MESH_SETTINGS);
-  // const [supportSettings, setSupportSettings] = useState<SupportSettings>(DEFAULT_SUPPORT_SETTINGS);
-
+export default function Rightbar() {
   const { getMateriaux } = useCalculs()
+  const WorkState = useWorkState((p)=>p)
+  
 
 
   useEffect(() => {
@@ -25,10 +21,11 @@ export default function Rightbar({ currentWorkState }: { currentWorkState: Curre
   }, [])
 
   const model = useModel((s) => s);
+  console.log(model)
 
 
   const renderPanel = () => {
-    switch (currentWorkState) {
+    switch (WorkState.currentWorkState) {
       case 'geometry':
         return (
           <GeometryPanel/>

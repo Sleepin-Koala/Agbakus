@@ -5,6 +5,7 @@ import useCalculs from "../../../hooks/useCalculs";
 import type { Materiau } from "../../../types/material";
 import { useModel } from "../../../store/models";
 import { ActionButton } from "../components/actionInput";
+import { useWorkState } from "../../../store/modules";
 
 /* ========================================================================== *
  * COMPOSANTS UI INTÉGRÉS (PANEL KIT)
@@ -135,10 +136,12 @@ export default function MaterialPanel() {
   ) || (materiaux && materiaux.length > 0 ? materiaux[0] : undefined);
 
   const setMateriau = useModel((p)=>p.setMateriau)
-  
+  const WorkState = useWorkState((p)=>p)
   const handleApply = () => {
     if (currentMateriau) {
       setMateriau(currentMateriau)
+        
+      WorkState.SetCurrentWorkState("material")
     } else {
       alert("Aucun matériau sélectionné.");
     }

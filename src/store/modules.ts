@@ -1,15 +1,17 @@
 import { create } from "zustand/react";
 
 export interface Module {
-  currentModule : currentModule
-  setCurrentModule : (currentModule : currentModule) => void
+  currentWorkState : WorkState
+  SetCurrentWorkState : (currentModule : WorkState) => void
 }
 
-type currentModule = "part" | "material" | "step" |"BC" |"Load" | "Mesh" | "Job" 
 
-export const usetype = create<Module>((set)=>({
-  currentModule : "part",
-  setCurrentModule : (currentModule : currentModule)=> set({currentModule})
+
+export type WorkState = "geometry" | "material" | "support" |"mesh" | "job" | "job" 
+
+export const useWorkState = create<Module>((set)=>({
+  currentWorkState : "geometry",
+  SetCurrentWorkState : (currentWorkState : WorkState)=> set({currentWorkState})
 }));
 
 

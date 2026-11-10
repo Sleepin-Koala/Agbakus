@@ -5,6 +5,7 @@ import { useModel } from "../../../store/models"; // Ajustez le chemin vers votr
 import { ActionButton } from "../components/actionInput";
 import type { MeshSettings } from "../../../types/mesh";
 import useCalculs, { type RequeteMaillage } from "../../../hooks/useCalculs";
+import { useWorkState } from "../../../store/modules";
 
 /* ========================================================================== *
  * TYPES & CONSTANTES
@@ -222,11 +223,15 @@ export default function MeshPanel() {
     setMeshSettings(next);
   };
 
+    const WorkState = useWorkState((p)=>p)
+  
 
   async function handleGenerate(){
     if (!type) return 
     const r = {"geometrie": model.geometry , "maillage": meshSettings} as RequeteMaillage
     model.setMesh( await genererMaillage(r))
+    WorkState.SetCurrentWorkState("material")
+
   }
 
 

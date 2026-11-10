@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ActionButton } from "../components/actionInput";
 import { MdVerified } from "react-icons/md";
 import { SetSelectBoundaryConditions } from "../../../store/states";
+import { cx } from "../components/cx";
 
 /* ========================================================================== *
  * TYPES & CONSTANTES AUTONOMES
@@ -55,10 +56,6 @@ const DEFAULT_MODEL: SimulationModel = {
 };
 
 const gs = { fill: "none", stroke: "currentColor", strokelongeur: 1.1 } as const;
-
-function cx(...args: (string | boolean | undefined | null)[]): string {
-  return args.filter(Boolean).join(" ");
-}
 
 /* ========================================================================== *
  * GLYPHES & SVGS
@@ -116,65 +113,6 @@ function SectionGroup({ title, badge, children }: { title: string; badge?: strin
   );
 }
 
-function NumberField({ id, label, unit, value, onChange, min, minMessage, step }: {
-  id: string; label: string; unit?: string; value: number; onChange: (v: number) => void;
-  min?: number; minMessage?: string; step?: number; compact?: boolean;
-}) {
-  const [text, setText] = useState(String(value));
-
-  React.useEffect(() => {
-    setText(String(value));
-  }, [value]);
-
-  const n = Number(text);
-  const isError = min !== undefined && n < min;
-
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex justify-between text-[11px] text-zinc-300">
-        <label htmlFor={id}>{label}</label>
-        {unit ? <span className="text-amber-400/80">{unit}</span> : null}
-      </div>
-      <input
-        id={id}
-        type="number"
-        step={step ?? "any"}
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-          const parsed = parseFloat(e.target.value);
-          if (!isNaN(parsed)) onChange(parsed);
-        }}
-        className={cx(
-          "w-full rounded border bg-amber-900 px-2 py-1 text-xs text-zinc-100 outline-none transition-colors focus:border-amber-400",
-          isError ? "border-red-500" : "border-[#2a2c33]"
-        )}
-      />
-      {isError && minMessage ? <span className="text-[10px] text-red-400">{minMessage}</span> : null}
-    </div>
-  );
-}
-
-function SelectField<T extends string>({ id, label, value, onChange, options }: {
-  id: string; label: string; value: T; onChange: (v: T) => void;
-  options: Array<{ value: T; label: string }>;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-[11px] text-zinc-300">{label}</label>
-      <select
-        id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value as T)}
-        className="w-full rounded border border-[#2a2c33] bg-amber-900 px-2 py-1 text-xs text-zinc-100 outline-none focus:border-amber-400"
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
-    </div>
-  );
-}
 
 /* ========================================================================== *
  * COMPOSANT PRINCIPAL AUTONOME
@@ -188,14 +126,14 @@ export default function SupportPanel() {
   const setSupport = (kind: SupportKind, on: boolean) =>
     setModel({ ...model, support: { ...s, supports: { ...s.supports, [kind]: on } } });
 
-  const setForce = (patch: Partial<typeof s.force>) =>
-    setModel({ ...model, support: { ...s, force: { ...s.force, ...patch } } });
+  // const setForce = (patch: Partial<typeof s.force>) =>
+  //   setModel({ ...model, support: { ...s, force: { ...s.force, ...patch } } });
 
-  const setPressure = (patch: Partial<typeof s.pressure>) =>
-    setModel({ ...model, support: { ...s, pressure: { ...s.pressure, ...patch } } });
+  // const setPressure = (patch: Partial<typeof s.pressure>) =>
+  //   setModel({ ...model, support: { ...s, pressure: { ...s.pressure, ...patch } } });
 
-  const setGravity = (patch: Partial<typeof s.gravity>) =>
-    setModel({ ...model, support: { ...s, gravity: { ...s.gravity, ...patch } } });
+  // const setGravity = (patch: Partial<typeof s.gravity>) =>
+  //   setModel({ ...model, support: { ...s, gravity: { ...s.gravity, ...patch } } });
 
   const activeCount = SUPPORTS.filter((x) => s.supports[x.kind]).length;
 
@@ -235,18 +173,18 @@ export default function SupportPanel() {
     });
   }
 
-  const removeCondition = (id: string) => {
-    if (id.startsWith("sup-")) {
-      const kind = id.replace("sup-", "") as SupportKind;
-      setSupport(kind, false);
-    } else if (id === "load-force") {
-      setForce({ fx: 0, fy: 0, fz: 0 });
-    } else if (id === "load-pressure") {
-      setPressure({ value: 0 });
-    } else if (id === "load-gravity") {
-      setGravity({ enabled: false });
-    }
-  };
+  // const removeCondition = (id: string) => {
+  //   if (id.startsWith("sup-")) {
+  //     const kind = id.replace("sup-", "") as SupportKind;
+  //     setSupport(kind, false);
+  //   } else if (id === "load-force") {
+  //     setForce({ fx: 0, fy: 0, fz: 0 });
+  //   } else if (id === "load-pressure") {
+  //     setPressure({ value: 0 });
+  //   } else if (id === "load-gravity") {
+  //     setGravity({ enabled: false });
+  //   }
+  // };
 
   function handleApply(): void {
     BoundaryConditionState.toogleActivation()

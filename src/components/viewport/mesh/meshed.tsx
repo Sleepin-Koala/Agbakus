@@ -1,7 +1,7 @@
 import { Point } from "@react-three/drei";
 import { useMemo } from "react";
-import type { Mesh } from "../../types/mesh";
 import { DoubleSide } from "three"
+import type { Mesh } from "../../../types/mesh";
 
 
 

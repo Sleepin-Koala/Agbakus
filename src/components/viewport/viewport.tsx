@@ -1,12 +1,8 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from '@react-three/fiber'
-import { SimulationToolbar } from "./helpers";
-import { useEffect, useState } from "react";
-import { Meshed } from "./mesh/meshed";
-import { useModel, type ModelStore } from "../../store/models";
-import { NORMAL_COLOUR } from "../../store/core";
-import api from "../../api";
+import { useModel } from "../../store/models";
 import { Mesh } from "./mesh/Mesh";
+import { ModelRoot } from "./ModelRoot.tsx";
 
 
 
@@ -17,15 +13,17 @@ export default function Viewport() {
 
 
   return (
-    // <SimulationToolbar />
-    <Canvas camera={{ position: [5, 5, 5], up: [0, 0, 1] }}>
-      <axesHelper />
+    <Canvas camera={{ position: [5, 5, 5] }}>
+      {/* Repère monde et sol : THREE.JS (Y-up), donc À L'EXTÉRIEUR du ModelRoot */}
+      <axesHelper args={[1]} />
+      <gridHelper args={[4, 40]} />
       <color attach="background" args={['#181818']} />
       <ambientLight intensity={1} />
-      {currentModel && <Mesh model={currentModel} />}
+      {/* Tout le modèle passe par le ModelRoot : Z-up/mm -> Y-up/m en UN SEUL endroit */}
+      <ModelRoot>
+        {currentModel && <Mesh model={currentModel} />}
+      </ModelRoot>
       <OrbitControls />
     </Canvas>
   )
 }
-
-

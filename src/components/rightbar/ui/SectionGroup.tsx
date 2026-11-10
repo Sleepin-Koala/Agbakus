@@ -1,4 +1,5 @@
 import * as React from "react";
+import { cx } from "../components/cx";
 
 interface SectionGroupProps {
   /** Per-step storage key, e.g. "geometry.dims" — collapse state is remembered. */
@@ -32,9 +33,6 @@ export default function SectionGroup({ storageKey, title, badge, defaultOpen = t
     });
   };
 
-  function cx(arg0: string, arg1: string): string | undefined {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <section className="border-b border-[#2a2c33]">

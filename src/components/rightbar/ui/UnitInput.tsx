@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cx } from "../cx";
+import { cx } from "../components/cx";
 
 interface UnitInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "className"> {
   unit?: string;

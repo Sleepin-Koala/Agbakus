@@ -1,4 +1,5 @@
 import * as React from "react";
+import { cx } from "../components/cx";
 
 interface RadioCardProps {
   id: string;
@@ -16,9 +17,7 @@ interface RadioCardProps {
  * navigation, visible amber focus ring, aria-checked state.
  */
 export default function RadioCard({ id, selected, onSelect, onNavigate, title, caption, icon }: RadioCardProps) {
-  function cx(arg0: string, arg1: string): string | undefined {
-    throw new Error("Function not implemented.");
-  }
+
 
   return (
     <div

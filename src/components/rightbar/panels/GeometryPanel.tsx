@@ -3,6 +3,9 @@ import type { IconType } from "react-icons";
 import { MdCategory, MdCheckCircle } from "react-icons/md";
 import { type GeometryType, type GeometrySettings, DEFAULT_GEOMETRY_SETTINGS } from "../../../types/geometry";
 import { useModel } from "../../../store/models";
+import { ActionButton } from "../components/actionInput";
+import NumberField from "../ui/NumberField";
+import { useWorkState } from "../../../store/modules";
 
 /* ========================================================================== *
  * TYPES & CONSTANTES
@@ -14,22 +17,20 @@ const TYPES: ReadonlyArray<{ value: GeometryType; label: string; intro: string }
   { value: "cylindre", label: "Cylindre", intro: "Dimensions du cylindre." },
 ];
 
-type DimKey = "width" | "height" | "depth" | "radius";
+type DimKey = "longueur" | "hauteur" | "largeur" | "rayon";
 
 const DIMENSIONS: Record<GeometryType, ReadonlyArray<{ key: DimKey; label: string }>> = {
   pave: [
-    { key: "width", label: "Largeur" },
-    { key: "height", label: "Hauteur" },
-    { key: "depth", label: "Profondeur" },
+    { key: "longueur", label: "Longueur" },
+    { key: "hauteur", label: "Hauteur" },
+    { key: "largeur", label: "Largeur" },
   ],
   cylindre: [
-    { key: "radius", label: "Rayon" },
-    { key: "height", label: "Hauteur" },
+    { key: "rayon", label: "Rayon" },
+    { key: "hauteur", label: "Hauteur" },
   ],
 };
 
-const parse = (s: string) => (s.trim() === "" ? NaN : Number(s.replace(",", ".")));
-const fmt = (n: number) => (n !== undefined && n !== null ? String(+n.toFixed(4)) : "");
 
 /* ========================================================================== *
  * COMPOSANTS UI INTÉGRÉS (PANEL KIT)
@@ -65,67 +66,8 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function ActionButton({ icon: Icon, onClick, children }: { 
-  icon?: IconType; onClick?: () => void; children: ReactNode 
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex w-full items-center justify-center gap-2 rounded bg-green-700 px-3 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-600 active:bg-green-500"
-    >
-      {Icon ? <Icon aria-hidden className="text-lg" /> : null}
-      {children}
-    </button>
-  );
-}
 
-function NumberField({ label, unit, value, onChange, min, max, step, id }: {
-  label: string; unit?: string; value: number; onChange: (v: number) => void;
-  min?: number; max?: number; step?: number; id: string;
-}) {
-  const [text, setText] = useState(() => fmt(value));
 
-  useEffect(() => {
-    const p = parse(text);
-    if (!Number.isFinite(p) || Math.abs(p - value) > 1e-9) setText(fmt(value));
-  }, [value]);
-
-  const p = parse(text);
-  let error: string | null = null;
-  if (!Number.isFinite(p)) error = "Saisir un nombre valide";
-  else if (min !== undefined && p < min) error = `Minimum : ${fmt(min)}`;
-  else if (max !== undefined && p > max) error = `Maximum : ${fmt(max)}`;
-
-  const handleChange = (raw: string) => {
-    setText(raw);
-    const n = parse(raw);
-    if (Number.isFinite(n) && (min === undefined || n >= min) && (max === undefined || n <= max)) onChange(n);
-  };
-
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between gap-2">
-        <label htmlFor={id} className="text-[11px] font-medium text-amber-200">{label}</label>
-        {unit ? <span className="text-[11px] text-amber-400">{unit}</span> : null}
-      </div>
-      <input
-        id={id}
-        type="number"
-        inputMode="decimal"
-        step={step ?? "any"}
-        aria-invalid={error !== null}
-        value={text}
-        onChange={(e) => handleChange(e.target.value)}
-        className={
-          "w-full rounded border bg-amber-950 px-2.5 py-1.5 text-sm text-amber-100 outline-none transition-colors focus:ring-1 " +
-          (error ? "border-red-400 focus:ring-red-400" : "border-amber-700 focus:border-amber-400 focus:ring-amber-400")
-        }
-      />
-      {error ? <p role="alert" className="text-[11px] text-red-300">{error}</p> : null}
-    </div>
-  );
-}
 
 function SelectInput<T extends string>({ value, onChange, options, ariaLabel }: {
   value: T; onChange: (v: T) => void; options: { value: T; label: string }[]; ariaLabel?: string;
@@ -157,11 +99,15 @@ export default function GeometryPanel() {
   };
 
   const setGeometry = useModel((p)=>p.setGeometry)
+  const WorkState = useWorkState((p)=>p)
+
 
   const current = TYPES.find((s) => s.value === settings.type) ?? TYPES[0];
 
   const handleValidate = () => {
     setGeometry(settings)
+    WorkState.SetCurrentWorkState("geometry")
+
   };
 
 
