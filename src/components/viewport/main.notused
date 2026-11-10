@@ -1,0 +1,41 @@
+
+
+
+  async function requestMaillage(){
+    const r = await api.post("/maillage" , {"geometrie": {type: "pave",
+      longueur: 2,
+      largeur: 2,
+      hauteur: 2,
+      nx: 12,
+      ny: 12,
+      nz: 12
+    }})
+
+    setMesh(r)
+  }
+
+  async function requestSimulation(){
+    const r = await api.post("/maillage" , {"geometrie": {type: "pave",
+      longueur: 2,
+      largeur: 2,
+      hauteur: 2,
+      nx: 12,
+      ny: 12,
+      nz: 12
+    }})
+
+    setMesh(r)
+  }
+
+
+
+
+export type CubeDims = {
+  type: 'cube';
+  dims: { longeur: number; hauteur: number; depth: number };
+};
+
+export type CylinderDims = {
+  type: 'cylinder';
+  dims: { radius: number; length: number };
+};

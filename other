@@ -1,0 +1,11 @@
+      // Le contrat stipule que le frontend ajoute lui-même le choix "Autre"
+    // const listeAvecAutre: Materiau[] = [
+    //   ...data.materiaux,
+    //   {
+    //     nom: "Autre",
+    //     masse_volumique: 0,
+    //     module_young: 0,
+    //     coefficient_poisson: 0,
+    //     limite_elastique: 0,
+    //   }
+    // ];
