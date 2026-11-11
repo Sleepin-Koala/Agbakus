@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { MdCheckCircle, MdDeleteOutline } from "react-icons/md";
-import { useModel } from "../../../store/models"; // Ajuste le chemin selon ton projet
+import { useModel } from "../../../../store/models"; // Ajuste le chemin selon ton projet
 
 /* ========================================================================== *
  * COMPOSANT UI DE SECTION
@@ -69,9 +69,9 @@ export default function LoadPanel() {
   };
 
   const handleClear = () => {
-    setLoad(null);
+    setLoad({type: "force" , value : 0, target : {x: 0 , y:0 , z:0}});
     setValue(1000);
-    setTarget({ x: 0, y: -1, z: 0 });
+    setTarget({ x: 0, y: 0, z: 1 });
   };
 
   return (

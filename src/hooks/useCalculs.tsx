@@ -64,7 +64,7 @@ export interface ErreurAPI {
 export default function useCalculs() {
   const [materiaux, setMateriaux] = useState<Materiau[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [erreur, setErreur] = useState<ErreurAPI | null>(null);
+  const [_, setErreur] = useState<ErreurAPI | null>(null);
 
 
   // 1. GET /materiaux

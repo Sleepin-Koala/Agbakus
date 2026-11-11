@@ -1,4 +1,3 @@
-import { Material } from "three";
 
 export interface Materiau {
   nom: string;

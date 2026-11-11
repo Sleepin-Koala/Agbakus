@@ -1,84 +1,30 @@
-import * as React from "react";
 import { useState } from "react";
-import { MdCheckCircle, MdCancel, MdPlayArrow, MdRefresh } from "react-icons/md";
-import { useModel } from "../../../store/models"; // Ajuste le chemin selon ton projet
-import { StoreMeshSettings } from "../../../store/states";
-import api from "../../../api";
-import useCalculs, { type RequeteSimulation } from "../../../hooks/useCalculs";
-import { normalVersEncastrement, type Encastrement } from "../../../types/core";
+import { MdCheckCircle, MdPlayArrow, MdRefresh } from "react-icons/md";
+import { useModel } from "../../../../store/models"; 
+import { StoreMeshSettings } from "../../../../store/states";
+import useCalculs, { type RequeteSimulation } from "../../../../hooks/useCalculs";
+import { normalVersEncastrement, type Encastrement } from "../../../../types/core";
+import { SectionGroup } from "./components/SectionGroup";
+import { SummaryItem } from "./components/SummaryItem";
 
 /* ========================================================================== *
  * COMPOSANT UI DE SECTION (Identique à SupportPanel)
  * ========================================================================== */
 
-function SectionGroup({
-  title,
-  badge,
-  children,
-}: {
-  title: string;
-  badge?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded border border-[#2a2c33] bg-amber-900 p-3 text-amber-100">
-      <div className="mb-2 flex items-center justify-between border-b border-[#202227] pb-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300/80">
-          {title}
-        </span>
-        {badge ? (
-          <span className="rounded bg-amber-950 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
-            {badge}
-          </span>
-        ) : null}
-      </div>
-      <div className="space-y-2">{children}</div>
-    </div>
-  );
-}
+
 
 /* ========================================================================== *
  * LIGNE DE RÉSUMÉ D'UNE ÉTAPE
  * ========================================================================== */
 
-function SummaryItem({
-  label,
-  isConfigured,
-  detail,
-}: {
-  label: string;
-  isConfigured: boolean;
-  detail: string;
-}) {
-  return (
-    <div className="flex items-start justify-between gap-2 border-b border-amber-950/60 pb-2 text-xs last:border-b-0 last:pb-0">
-      <div className="flex items-center gap-2">
-        {isConfigured ? (
-          <MdCheckCircle className="shrink-0 text-base text-emerald-400" />
-        ) : (
-          <MdCancel className="shrink-0 text-base text-red-400" />
-        )}
-        <span className="font-mono text-[11px] font-semibold uppercase tracking-wide text-amber-100">
-          {label}
-        </span>
-      </div>
-      <span
-        className={`text-right text-[11px] ${
-          isConfigured ? "text-amber-200" : "italic text-amber-400/60"
-        }`}
-      >
-        {detail}
-      </span>
-    </div>
-  );
-}
+
 
 /* ========================================================================== *
  * COMPOSANT PRINCIPAL : JOB PANEL
  * ========================================================================== */
 
 export default function JobPanel() {
-  const { geometry, materiau, boundary, load, clean  , setResult ,result , setMesh , mesh} = useModel((p) => p);
+  const { geometry, materiau, boundary, load, clean  , setResult  , mesh} = useModel((p) => p);
   const [isRunning, setIsRunning] = useState(false);
   const [jobSuccess, setJobSuccess] = useState(false);
   const meshsettings = StoreMeshSettings((p)=>p.MeshSettings)
@@ -150,7 +96,7 @@ const handleRunSimulation = async () => {
     // 3) Charge : la direction n'est utile qu'en cisaillement
     const sollicitation = "compression"; // TODO : à lire dans ton store quand il existera
     const charge: { valeur: number; direction?: string } = { valeur: load!.value };
-    if (sollicitation === "cisaillement") {
+    if (sollicitation == "cisaillement" as string) {
       charge.direction = encastrement.axe === "x" ? "y" : "x"; // doit différer de l'axe d'encastrement
     }
 
@@ -163,7 +109,7 @@ const handleRunSimulation = async () => {
       encastrement,
     };
 
-    const res = await lancerSimulation(payload as RequeteSimulation);
+    const res = await lancerSimulation(payload as unknown as RequeteSimulation);
     setResult(res); // c'est tout : Mesh.tsx lit result
     setJobSuccess(true);
   } catch (error) {
@@ -181,7 +127,7 @@ const handleRunSimulation = async () => {
           <SummaryItem
             label="Géométrie"
             isConfigured={Boolean(geometry)}
-            detail={getGeometryDetail()}
+            detail={getGeometryDetail() as string}
           />
           <SummaryItem
             label="Matériau"

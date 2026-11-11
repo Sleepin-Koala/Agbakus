@@ -1,12 +1,12 @@
 import  { useState, useEffect, type ReactNode } from "react";
 import type { IconType } from "react-icons";
 import { MdGridView, MdExpandMore, MdCheckCircle } from "react-icons/md";
-import { useModel } from "../../../store/models"; // Ajustez le chemin vers votre store si nécessaire
-import { ActionButton } from "../components/actionInput";
-import type { MeshSettings } from "../../../types/mesh";
-import useCalculs, { type RequeteMaillage } from "../../../hooks/useCalculs";
-import { useWorkState } from "../../../store/modules";
-import { StoreMeshSettings } from "../../../store/states";
+import useCalculs, { type RequeteMaillage } from "../../../../hooks/useCalculs";
+import { useModel } from "../../../../store/models";
+import { StoreMeshSettings } from "../../../../store/states";
+import type { MeshSettings } from "../../../../types/mesh";
+import  { ActionButton } from "../../components/actionInput";
+
 
 /* ========================================================================== *
  * TYPES & CONSTANTES
@@ -195,8 +195,6 @@ export default function MeshPanel() {
     const next = { ...meshSettings, ...patch };
     setMeshSettings(next);
   };
-
-  const WorkState = useWorkState((p) => p)
 
 
   async function handleRequestMaillage() {

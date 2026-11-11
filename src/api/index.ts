@@ -1,4 +1,4 @@
-const SERVER = "http://localhost:8000";
+const SERVER = "http://127.0.0.1:9888";
 
 // Classe d'erreur personnalisée avec typage du statut
 export class ApiError extends Error {

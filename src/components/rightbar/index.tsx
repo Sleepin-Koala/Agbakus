@@ -1,28 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-import { useModel } from '../../store/models';
-import { DEFAULT_GEOMETRY_SETTINGS, type GeometrySettings } from '../../types/geometry';
 import GeometryPanel from './panels/GeometryPanel';
-import type { Materiau } from '../../types/material';
 import useCalculs from '../../hooks/useCalculs';
 import MaterialPanel from './panels/MaterialPanel';
 import SupportPanel from './panels/SupportPanel';
-import MeshPanel from './panels/MeshPanel';
 import { useWorkState } from '../../store/modules';
 import JobPanel from './panels/JobPanel';
-import LoadPanel from './panels/LoadPanel';
+import LoadPanel from './panels/LoadPanel/LoadPanel';
+import MeshPanel from './panels/MeshPanel/MeshPanel';
+
+
 
 export default function Rightbar() {
   const { getMateriaux } = useCalculs()
   const WorkState = useWorkState((p)=>p)
-  
-
 
   useEffect(() => {
     getMateriaux()
   }, [])
-
-  const model = useModel((s) => s);
 
 
   const renderPanel = () => {

@@ -3,11 +3,26 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "dist-electron/main.js",
+  "build": {
+    "appId": "com.isem.simulation",
+    "files": [
+      "dist/**",
+      "dist-electron/**"
+    ],
+    "extraResources": [
+      {
+        "from": "dist-backend/backend",
+        "to": "backend"
+      }
+    ]
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "pnpm run build && electron electron/."
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -27,9 +42,12 @@
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "^5.1.1",
+    "electron": "^45.2.3",
     "three": "^0.186.1",
     "typescript": "~5.9.3",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vite-plugin-electron": "^1.2.0",
+    "vite-plugin-electron-renderer": "^1.0.0"
   },
   "msw": {
     "workerDirectory": [

@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from "react";
-import type { IconType } from "react-icons";
 
 type HoldOnButtonProps = {
   onClick?: () => Promise<void> | void;
@@ -9,7 +8,7 @@ type HoldOnButtonProps = {
 };
 
 export function HoldOnButton({ onClick, children , onActive}: HoldOnButtonProps) {
-  const [isActive, setIsActive] = useState(false);
+  const [_, setIsActive] = useState(false);
 
   const handleClick = async () => {
     if (onActive || !onClick) return;

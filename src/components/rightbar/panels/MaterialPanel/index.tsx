@@ -1,34 +1,23 @@
 import { useState, useEffect, type ReactNode } from "react";
 import type { IconType } from "react-icons";
 import { MdCheckCircle, MdRestartAlt, MdScience, MdTune, MdVerified } from "react-icons/md";
-import useCalculs from "../../../hooks/useCalculs";
-import type { Materiau } from "../../../types/material";
-import { useModel } from "../../../store/models";
-import { ActionButton } from "../components/actionInput";
-import { useWorkState } from "../../../store/modules";
+import useCalculs from "../../../../hooks/useCalculs";
+import { useModel } from "../../../../store/models";
+import type { Materiau } from "../../../../types/material";
+import  { ActionButton } from "../../components/actionInput";
+import { NumberField } from "./components/NumberField";
+import  { PanelShell } from "./components/PanelShell";
+import  { SectionLabel } from "./components/SectionLabel";
+import { SelectInput } from "./components/SelectInput";
+
 
 /* ========================================================================== *
  * COMPOSANTS UI INTÉGRÉS (PANEL KIT)
  * ========================================================================== */
 
-function PanelShell({ title, icon: HeaderIcon, footer, children }: {
-  title: string; icon: IconType; footer?: ReactNode; children: ReactNode;
-}) {
-  return (
-    <div className="flex h-full flex-col bg-amber-900 text-amber-100 max-w-sm border border-amber-700">
-      <div className="flex items-center justify-between border-b border-amber-700/50 p-3">
-        <span className="text-sm font-semibold text-amber-100">{title}</span>
-        <HeaderIcon aria-hidden className="text-base text-amber-400" />
-      </div>
-      <div className="flex-1 space-y-4 overflow-y-auto p-3">{children}</div>
-      {footer ? <div className="border-t border-amber-700/50 bg-amber-950/40 p-3">{footer}</div> : null}
-    </div>
-  );
-}
 
-function SectionLabel({ children }: { children: ReactNode }) {
-  return <span className="block text-[11px] font-medium uppercase tracking-wider text-amber-300/70">{children}</span>;
-}
+
+
 
 
 function SecondaryButton({ icon: Icon, onClick, children }: { 
@@ -46,71 +35,9 @@ function SecondaryButton({ icon: Icon, onClick, children }: {
   );
 }
 
-function NumberField({ label, unit, value, step, id, disabled }: {
-  label: string; unit?: string; value: number;
-  step?: number; id: string; disabled?: boolean;
-}) {
-  const [text, setText] = useState(() => (value !== undefined && value !== null ? String(value) : ""));
 
-  useEffect(() => {
-    if (value !== undefined && value !== null) {
-      setText(String(value));
-    }
-  }, [value]);
 
-  return (
-    <div className={`space-y-1 ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}>
-      <div className="flex items-center justify-between gap-2">
-        <label htmlFor={id} className={`text-[11px] font-medium ${disabled ? "text-amber-300/40" : "text-amber-200"}`}>
-          {label} {disabled && "(Non fourni par l'API)"}
-        </label>
-        {unit ? <span className={`text-[11px] ${disabled ? "text-amber-400/40" : "text-amber-400"}`}>{unit}</span> : null}
-      </div>
-      <input
-        id={id}
-        type="number"
-        inputMode="decimal"
-        disabled={disabled}
-        step={step ?? "any"}
-        value={text}
-        readOnly
-        className={
-          "w-full rounded border px-2.5 py-1.5 text-sm outline-none transition-colors " +
-          (disabled 
-            ? "border-amber-800/40 bg-amber-950/40 text-amber-300/40 cursor-not-allowed select-none" 
-            : "border-amber-700 bg-amber-950 text-amber-100 cursor-default")
-        }
-      />
-    </div>
-  );
-}
 
-function SelectInput<T extends string>({ value, onChange, options, ariaLabel, disabled }: {
-  value: T; onChange: (v: T) => void; options: { value: T; label: string }[]; ariaLabel?: string; disabled?: boolean;
-}) {
-  return (
-    <select
-      aria-label={ariaLabel}
-      value={value}
-      disabled={disabled}
-      onChange={(e) => onChange(e.target.value as T)}
-      className={
-        "w-full rounded border px-2.5 py-1.5 text-sm outline-none " +
-        (disabled
-          ? "border-amber-800/40 bg-amber-950/40 text-amber-300/40 cursor-not-allowed"
-          : "border-amber-700 bg-amber-950 text-amber-100 focus:border-amber-400 focus:ring-1 focus:ring-amber-400")
-      }
-    >
-      {options.length === 0 ? (
-        <option value="" disabled>Chargement des matériaux...</option>
-      ) : (
-        options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))
-      )}
-    </select>
-  );
-}
 
 /* ========================================================================== *
  * COMPOSANT PRINCIPAL ADAPTÉ À L'API
