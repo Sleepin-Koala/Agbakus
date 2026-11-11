@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cx } from "../components/cx";
+import { cx } from "./cx";
 
 interface SectionGroupProps {
   /** Per-step storage key, e.g. "geometry.dims" — collapse state is remembered. */

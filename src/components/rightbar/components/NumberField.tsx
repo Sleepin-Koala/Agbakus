@@ -1,6 +1,6 @@
 import * as React from "react";
-import UnitInput from "../ui/UnitInput";
-import { cx } from "../components/cx";
+import UnitInput from "./UnitInput";
+import { cx } from "./cx";
 
 export interface NumberFieldProps {
   id: string;

@@ -1,9 +1,10 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect, useRef} from "react";
 import { ActionButton } from "../components/actionInput";
-import { MdVerified } from "react-icons/md";
+import { MdCheckCircle, MdVerified } from "react-icons/md";
 import { SetSelectBoundaryConditions } from "../../../store/states";
 import { cx } from "../components/cx";
+import { HoldOnButton } from "../components/HoldonButton";
 
 /* ========================================================================== *
  * TYPES & CONSTANTES AUTONOMES
@@ -121,21 +122,27 @@ function SectionGroup({ title, badge, children }: { title: string; badge?: strin
 export default function SupportPanel() {
   const [model, setModel] = useState<SimulationModel>(DEFAULT_MODEL);
   const s = model.support;
-  const BoundaryConditionState = SetSelectBoundaryConditions((p)=>p)
+  const BoundaryConditionState = SetSelectBoundaryConditions((p) => p)
+  const [valid, setValid] = useState<boolean>(false);
+
+
+  const wasActive = useRef(false);
 
   const setSupport = (kind: SupportKind, on: boolean) =>
     setModel({ ...model, support: { ...s, supports: { ...s.supports, [kind]: on } } });
 
-  // const setForce = (patch: Partial<typeof s.force>) =>
-  //   setModel({ ...model, support: { ...s, force: { ...s.force, ...patch } } });
-
-  // const setPressure = (patch: Partial<typeof s.pressure>) =>
-  //   setModel({ ...model, support: { ...s, pressure: { ...s.pressure, ...patch } } });
-
-  // const setGravity = (patch: Partial<typeof s.gravity>) =>
-  //   setModel({ ...model, support: { ...s, gravity: { ...s.gravity, ...patch } } });
 
   const activeCount = SUPPORTS.filter((x) => s.supports[x.kind]).length;
+
+
+  useEffect(() => {
+    if (BoundaryConditionState.isActive) {
+      wasActive.current = true;
+    } else if (wasActive.current) {
+        wasActive.current = false;
+      setValid(true);
+    }
+  }, [BoundaryConditionState.isActive]);
 
   // Génération dynamique de la liste des conditions actives
   const activeConditions: ActiveCondition[] = [];
@@ -173,25 +180,31 @@ export default function SupportPanel() {
     });
   }
 
-  // const removeCondition = (id: string) => {
-  //   if (id.startsWith("sup-")) {
-  //     const kind = id.replace("sup-", "") as SupportKind;
-  //     setSupport(kind, false);
-  //   } else if (id === "load-force") {
-  //     setForce({ fx: 0, fy: 0, fz: 0 });
-  //   } else if (id === "load-pressure") {
-  //     setPressure({ value: 0 });
-  //   } else if (id === "load-gravity") {
-  //     setGravity({ enabled: false });
-  //   }
-  // };
 
-  function handleApply(): void {
-    BoundaryConditionState.toogleActivation()
-  }
+
 
   return (
     <div className="flex flex-col gap-3 max-w-sm bg-amber-900 p-3 text-zinc-100 font-sans border border-[#2a2c33] rounded">
+      
+      {valid && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-xs rounded-lg border border-amber-700 bg-amber-900 p-5 text-center text-amber-100 shadow-2xl">
+            <MdCheckCircle className="mx-auto mb-3 text-4xl text-emerald-400" />
+            <h3 className="mb-1 text-base font-semibold">Face encastrée</h3>
+            <p className="mb-4 text-xs text-amber-200/80">
+              Vous avez effectivement fixé cette face avec succès.
+            </p>
+            <button
+              type="button"
+              onClick={() => setValid(false)}
+              className="w-full rounded border border-amber-600 bg-amber-800 px-3 py-1.5 text-sm font-medium text-amber-100 transition hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
+      
       <SectionGroup title="Boundary conditions" badge={`${activeCount} set`}>
         <ul className="flex flex-col">
           {SUPPORTS.map((x) => (
@@ -212,93 +225,33 @@ export default function SupportPanel() {
         </ul>
       </SectionGroup>
 
-
-      {/* <SectionGroup title="Loads">
-        <fieldset className="flex flex-col gap-2.5">
-          <legend className="sr-only">Concentrated force</legend>
-          <p className="text-[11px] font-medium text-zinc-400">Concentrated force</p>
-          <div className="grid grid-cols-3 gap-1.5">
-            {(["fx", "fy", "fz"] as const).map((k) => (
-              <NumberField
-                key={k} id={`force-${k}`} label={k.toUpperCase()} unit="N" compact
-                value={s.force[k]} step={100}
-                onChange={(v) => setForce({ [k]: v })}
-              />
-            ))}
+      {valid && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-xs rounded-lg border border-amber-700 bg-amber-900 p-5 text-center text-amber-100 shadow-2xl">
+            <MdCheckCircle className="mx-auto mb-3 text-4xl text-emerald-400" />
+            <h3 className="mb-1 text-base font-semibold">Maillage validée</h3>
+            <p className="mb-4 text-xs text-amber-200/80">
+              Les paramètres de maillage ont bien été enregistrés.
+            </p>
+            <button
+              type="button"
+              onClick={() => setValid(false)}
+              className="w-full rounded border border-amber-600 bg-amber-800 px-3 py-1.5 text-sm font-medium text-amber-100 transition hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            >
+              Fermer
+            </button>
           </div>
-        </fieldset>
+        </div>)}
 
-        <fieldset className="flex flex-col gap-2.5">
-          <legend className="sr-only">Distributed pressure</legend>
-          <p className="text-[11px] font-medium text-zinc-400">Distributed pressure</p>
-          <NumberField
-            id="pressure-value" label="Magnitude" unit="MPa"
-            value={s.pressure.value} step={0.1}
-            onChange={(v) => setPressure({ value: v })}
-          />
-          <div className="grid grid-cols-2 gap-1.5">
-            <SelectField<LoadAxis>
-              id="pressure-axis" label="Direction" value={s.pressure.axis}
-              onChange={(v) => setPressure({ axis: v })}
-              options={[
-                { value: "x", label: "Normal to X" },
-                { value: "y", label: "Normal to Y" },
-                { value: "z", label: "Normal to Z" },
-              ]}
-            />
-            <SelectField<"1" | "-1">
-              id="pressure-sign" label="Sense"
-              value={String(s.pressure.sign) as "1" | "-1"}
-              onChange={(v) => setPressure({ sign: Number(v) as 1 | -1 })}
-              options={[{ value: "-1", label: "− (inward)" }, { value: "1", label: "+ (outward)" }]}
-            />
-          </div>
-        </fieldset>
 
-        <fieldset className="flex flex-col gap-2.5">
-          <legend className="sr-only">Gravity</legend>
-          <label className="flex cursor-pointer items-center gap-2 text-[11px] text-zinc-300">
-            <input type="checkbox" checked={s.gravity.enabled}
-              onChange={(e) => setGravity({ enabled: e.target.checked })}
-              className="h-3.5 w-3.5 accent-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400" />
-            Gravity · −Y
-          </label>
-          {s.gravity.enabled ? (
-            <NumberField
-              id="gravity-mag" label="Magnitude" unit="m/s²"
-              value={s.gravity.magnitude} min={0.01}
-              minMessage="Gravity must be greater than 0" step={0.01}
-              onChange={(v) => setGravity({ magnitude: v })}
-            />
-          ) : null}
-        </fieldset>
-      </SectionGroup> */}
+      <HoldOnButton
+        onActive={BoundaryConditionState.isActive}
+        onClick={BoundaryConditionState.toogleActivation}
+      >
+        Sélectionner une face
+      </HoldOnButton>
 
-      {/* {activeConditions.length > 0 ? (
-        <SectionGroup title="Active Summary">
-          <ul className="flex flex-col gap-1.5 font-mono text-[11px]">
-            {activeConditions.map((cond) => (
-              <li key={cond.id} className="flex items-center justify-between gap-2 rounded-[3px] border border-[#2a2c33] bg-amber-900px-2 py-1">
-                <div className="flex flex-col">
-                  <span className="font-bold text-amber-400">{cond.label}</span>
-                  <span className="text-zinc-400">{cond.detail}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeCondition(cond.id)}
-                  className="shrink-0 font-mono text-[13px] text-zinc-500 hover:text-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-400"
-                >
-                  ×
-                </button>
-              </li>
-            ))}
-          </ul>
-        </SectionGroup>
-      ) : null} */}
 
-      <ActionButton icon={MdVerified} onClick={handleApply}>
-        Appliquer les propriétés
-      </ActionButton>
     </div>
   );
 }

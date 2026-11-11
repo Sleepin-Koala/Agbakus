@@ -1,6 +1,6 @@
 import { useState, useEffect, type ReactNode } from "react";
 import type { IconType } from "react-icons";
-import { MdRestartAlt, MdScience, MdTune, MdVerified } from "react-icons/md";
+import { MdCheckCircle, MdRestartAlt, MdScience, MdTune, MdVerified } from "react-icons/md";
 import useCalculs from "../../../hooks/useCalculs";
 import type { Materiau } from "../../../types/material";
 import { useModel } from "../../../store/models";
@@ -119,6 +119,8 @@ function SelectInput<T extends string>({ value, onChange, options, ariaLabel, di
 export default function MaterialPanel() {
   const { materiaux, getMateriaux } = useCalculs();
   const [selectedNom, setSelectedNom] = useState<string>("");
+  const [valid, setValid] = useState<boolean>(false);
+
 
   useEffect(() => {
     getMateriaux();
@@ -136,12 +138,10 @@ export default function MaterialPanel() {
   ) || (materiaux && materiaux.length > 0 ? materiaux[0] : undefined);
 
   const setMateriau = useModel((p)=>p.setMateriau)
-  const WorkState = useWorkState((p)=>p)
   const handleApply = () => {
     if (currentMateriau) {
       setMateriau(currentMateriau)
-        
-      WorkState.SetCurrentWorkState("material")
+      setValid(true)
     } else {
       alert("Aucun matériau sélectionné.");
     }
@@ -173,6 +173,27 @@ export default function MaterialPanel() {
         </div>
       }
     >
+
+      {valid && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs">
+                <div className="w-full max-w-xs rounded-lg border border-amber-700 bg-amber-900 p-5 text-center text-amber-100 shadow-2xl">
+                  <MdCheckCircle className="mx-auto mb-3 text-4xl text-emerald-400" />
+                  <h3 className="mb-1 text-base font-semibold">Materiau validée</h3>
+                  <p className="mb-4 text-xs text-amber-200/80">
+                    Les paramètres de materiaux ont bien été enregistrés.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setValid(false)}
+                    className="w-full rounded border border-amber-600 bg-amber-800 px-3 py-1.5 text-sm font-medium text-amber-100 transition hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  >
+                    Fermer
+                  </button>
+                </div>
+              </div>
+            )}
+
+
       <div className="flex items-center justify-between border-b border-amber-700/50 pb-2">
         <div className="flex items-center gap-2">
           <MdScience aria-hidden className="text-lg text-amber-400" />

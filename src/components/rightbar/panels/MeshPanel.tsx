@@ -1,6 +1,6 @@
 import React, { useState, useEffect, type ReactNode } from "react";
 import type { IconType } from "react-icons";
-import { MdGridView, MdExpandMore } from "react-icons/md";
+import { MdGridView, MdExpandMore, MdCheckCircle } from "react-icons/md";
 import { useModel } from "../../../store/models"; // Ajustez le chemin vers votre store si nécessaire
 import { ActionButton } from "../components/actionInput";
 import type { MeshSettings } from "../../../types/mesh";
@@ -172,12 +172,14 @@ export default function MeshPanel() {
   // Récupération du store global
   const model = useModel((p) => p);
   const type = model.geometry?.type ?? "pave";
+  const [valid, setValid] = useState<boolean>(false);
 
-  const {genererMaillage} = useCalculs()
+
+  const { genererMaillage } = useCalculs()
 
   // État local du maillage synchronisé avec le store
   const [meshSettings, setMeshSettings] = useState<MeshSettings>(
-     {
+    {
       nx: 10,
       ny: 10,
       nz: 10,
@@ -186,32 +188,6 @@ export default function MeshPanel() {
     }
   );
 
-  // function mailler(g: {
-//  type: "pave";
-//  longueur: number;
-//  largeur: number;
-//  hauteur: number;
-//  nx: number;
-//  ny: number;
-//  nz: number;
-//  rayon?: undefined;
-//  n_theta?: undefined;
-//  n_z?: undefined;
-// } | {
-//  type: "cylindre";
-//  rayon: number;
-//  hauteur: number;
-//  n_theta: number;
-//  n_z: number;
-//  longueur?: undefined;
-//  largeur?: undefined;
-//  nx?: undefined;
-//  ny?: undefined;
-//  nz?: undefined;
-// }): {
-//  noeuds: Vec3[];
-//  faces: number[][];
-// }
 
   const [quality] = useState<MeshQuality | null>({
     jacobianMin: 0.88,
@@ -223,30 +199,17 @@ export default function MeshPanel() {
     setMeshSettings(next);
   };
 
-    const WorkState = useWorkState((p)=>p)
-  
+  const WorkState = useWorkState((p) => p)
 
-  async function handleGenerate(){
-    if (!type) return 
-    const r = {"geometrie": model.geometry , "maillage": meshSettings} as RequeteMaillage
-    model.setMesh( await genererMaillage(r))
-    WorkState.SetCurrentWorkState("material")
+
+  async function handleGenerate() {
+    if (!type) return
+    const r = { "geometrie": model.geometry, "maillage": meshSettings } as RequeteMaillage
+    model.setMesh(await genererMaillage(r))
+    setValid(true)
+
 
   }
-
-
-  // const handleGenerate = () => {
-  //   (model.geometry?.shape === "pave") ? {
-  //     {...model.geometry , }
-  //   }
-
-
-  //   alert(`Maillage généré avec succès pour [${shape.toUpperCase()}] !\n\nParamètres :\n${JSON.stringify(meshSettings, null, 2)}`);
-  // };
-
-
-
-
 
   return (
     <PanelShell
@@ -263,6 +226,27 @@ export default function MeshPanel() {
         </ActionButton>
       }
     >
+
+      {valid && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs">
+          <div className="w-full max-w-xs rounded-lg border border-amber-700 bg-amber-900 p-5 text-center text-amber-100 shadow-2xl">
+            <MdCheckCircle className="mx-auto mb-3 text-4xl text-emerald-400" />
+            <h3 className="mb-1 text-base font-semibold">Maillage validée</h3>
+            <p className="mb-4 text-xs text-amber-200/80">
+              Les paramètres de maillage ont bien été enregistrés.
+            </p>
+            <button
+              type="button"
+              onClick={() => setValid(false)}
+              className="w-full rounded border border-amber-600 bg-amber-800 px-3 py-1.5 text-sm font-medium text-amber-100 transition hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
+
+
       {/* Rendu conditionnel des paramètres de maillage selon la géométrie active */}
       {type === "cylindre" ? (
         <div className="space-y-3">

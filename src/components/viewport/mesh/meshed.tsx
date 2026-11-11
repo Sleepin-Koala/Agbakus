@@ -10,7 +10,6 @@ import type { Mesh } from "../../../types/mesh";
 export function Meshed({ faces, noeuds }: Mesh) {
     // 1) Les nœuds à plat : [[x,y,z],[x,y,z]] -> [x,y,z,x,y,z,...]
     const positions = useMemo(() => new Float32Array(noeuds.flat()), [noeuds])
-    console.log(noeuds.flat())
 
     // 2) Faces -> triangles (quad [a,b,c,d] => [a,b,c] + [a,c,d])
     const indexTriangles = useMemo(() => {
@@ -35,7 +34,7 @@ export function Meshed({ faces, noeuds }: Mesh) {
     }, [faces])
 
     return (
-        <group scale={0.01}>
+        <group>
             {/* Couche 1 : les points */}
             <points>
                 <bufferGeometry>
@@ -71,3 +70,4 @@ export function Meshed({ faces, noeuds }: Mesh) {
     )
 
 }
+

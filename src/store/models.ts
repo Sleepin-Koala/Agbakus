@@ -18,6 +18,7 @@ export interface ModelStore {
     setBoundary : (boundary : BoundaryConditions) => void
     setLoad : (load : Load) => void
     setMesh: (mesh : Mesh) => void
+    clean : () => void
 }
 
 
@@ -27,11 +28,12 @@ export const useModel = create<ModelStore>((set) => ({
   boundary : null,
   load : null,
   mesh : null,
-  setGeometry : (geometry) => set({geometry}),
+  setGeometry : (geometry) => set({geometry , mesh: null}),
   setMateriau : (materiau) => set({materiau}),
   setBoundary : (boundary) => set({boundary}),
   setLoad : (load) => set({load}),
   setMesh : (mesh) => set({mesh}),
+  clean: ()=>set({geometry: null , boundary: null , load : null , mesh : null , materiau: null})
 }))
 
 

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type { CubePart } from "../../../types/geometry";
 import { useModel } from "../../../store/models";
 import { NORMAL_COLOUR } from "../../../store/core";
 import { SetSelectBoundaryConditions } from "../../../store/states";
@@ -9,15 +8,41 @@ import type { ThreeEvent } from "@react-three/fiber";
 
 export function CubeSimple({ X , Y , Z }: { X : number , Y : number ,Z: number}) {
   const [hoveredFace, setHoveredFace] = useState<number|null>(null);
-  
+  const [selectedFace, setSelectedFace] = useState<number | null>(null);
 
   const model = useModel((p)=>p)
   const BoundaryConditionState = SetSelectBoundaryConditions((p)=>p)
 
+  function handleFaceClick(event: ThreeEvent<MouseEvent>) {
+    event.stopPropagation();
+    if (!BoundaryConditionState.isActive || !event.face) return;
+
+    const faceIndex = event.face.materialIndex;
+    setSelectedFace(faceIndex);
+    
+    model.setBoundary({
+      type: "encastrement",
+      target: event.face.normal,
+      appui: "face",
+    });
+
+    BoundaryConditionState.toogleActivation();
+    setHoveredFace(null);
+  }
 
   function onPointerMoves(event: ThreeEvent<PointerEvent>){
     setHoveredFace(event.face!.materialIndex)
   }
+
+  const getFaceColor = (index: number) => {
+    if (BoundaryConditionState.isActive && index === hoveredFace) {
+      return "#37568c";
+    }
+    if (index === selectedFace) {
+      return "#FFCCCB"
+    }
+    return NORMAL_COLOUR;
+  };
 
   return (
     // X, Y, Z = coordonnées BACKEND (longueur, largeur, hauteur), en mm.
@@ -27,9 +52,11 @@ export function CubeSimple({ X , Y , Z }: { X : number , Y : number ,Z: number})
     // Aucune rotation sur ce mesh : e.face.normal est donc déjà exprimée
     // dans le repère backend (utilisable directement pour l'encastrement).
     <mesh
-      position={[X / 2, Y / 2, Z / 2]} //origine
-      onClick={(e) => model.setBoundary({type: "encastrement" , "target": e.face!.normal ,"appui": "face"})}
-      onPointerMove={onPointerMoves}>
+      position={[X / 2, Y / 2, Z / 2]} // origine
+      onClick={handleFaceClick}
+      onPointerMove={onPointerMoves}
+      onPointerOut={() => setHoveredFace(null)}
+      >
       <boxGeometry args={[X, Y, Z]} />
 
       {[0, 1, 2, 3, 4, 5].map((index) => (
@@ -37,7 +64,7 @@ export function CubeSimple({ X , Y , Z }: { X : number , Y : number ,Z: number})
         <meshStandardMaterial
           key={index}
           attach={`material-${index}`}
-          color={(BoundaryConditionState.isActive && index == hoveredFace) ? "#37568c" : NORMAL_COLOUR}
+          color={getFaceColor(index)}
         />
       ))}
     </mesh>
