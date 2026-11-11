@@ -5,6 +5,7 @@ import { MdCheckCircle, MdVerified } from "react-icons/md";
 import { SetSelectBoundaryConditions } from "../../../store/states";
 import { cx } from "../components/cx";
 import { HoldOnButton } from "../components/HoldonButton";
+import { useModel } from "../../../store/models";
 
 /* ========================================================================== *
  * TYPES & CONSTANTES AUTONOMES
@@ -124,6 +125,7 @@ export default function SupportPanel() {
   const s = model.support;
   const BoundaryConditionState = SetSelectBoundaryConditions((p) => p)
   const [valid, setValid] = useState<boolean>(false);
+  const currentModel = useModel((p)=>p)
 
 
   const wasActive = useRef(false);
@@ -140,7 +142,7 @@ export default function SupportPanel() {
       wasActive.current = true;
     } else if (wasActive.current) {
         wasActive.current = false;
-      setValid(true);
+        if (currentModel.boundary) setValid(true);
     }
   }, [BoundaryConditionState.isActive]);
 
@@ -250,6 +252,10 @@ export default function SupportPanel() {
       >
         Sélectionner une face
       </HoldOnButton>
+
+      <ActionButton onClick={BoundaryConditionState.toogleActivation}>
+        ANNULER
+      </ActionButton>
 
 
     </div>

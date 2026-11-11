@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import api from "../api";
-import { Tube } from "@react-three/drei";
 import type { Materiau } from "../types/material";
 import type { MeshSettings } from "../types/mesh";
 import type { GeometrySettings } from "../types/geometry";
@@ -10,24 +9,25 @@ import type { GeometrySettings } from "../types/geometry";
 // ============================================================================
 
 
-
 export interface RequeteMaillage {
   geometrie: GeometrySettings;
   maillage?: MeshSettings;
 }
 
-// export interface RequeteSimulation extends RequeteMaillage {
-//   materiau: Partial<Materiau> & { nom: string }; // Seul "nom" est obligatoire si c'est un matériau connu
-//   sollicitation: "traction" | "compression" | "cisaillement";
-//   charge: {
-//     valeur: number;
-//     direction?: "x" | "y" | "z";
-//   };
-//   encastrement: {
-//     axe: "x" | "y" | "z";
-//     cote: "min" | "max";
-//   };
-// }
+export interface RequeteSimulation extends RequeteMaillage {
+  materiau: Partial<Materiau> & { nom: string }; // Seul "nom" est obligatoire si c'est un matériau connu
+  sollicitation: "traction" | "compression" | "cisaillement";
+
+  charge: {
+    valeur: number;
+    direction?: "x" | "y" | "z";
+  };
+
+  encastrement: {
+    axe: "x" | "y" | "z";
+    cote: "min" | "max";
+  };
+}
 
 export interface ReponseMaillage {
   noeuds: [number, number, number][];
@@ -83,19 +83,13 @@ const getMateriaux = useCallback(async () => {
 
   // 2. POST /maillage
   const genererMaillage = useCallback(async (payload: RequeteMaillage) => {
-    setIsLoading(true)
     return await api.post<ReponseMaillage>("/maillage",   {...payload})
-    setIsLoading(false)
-
   }, []);
 
   // 3. POST /simulation
-//   const lancerSimulation = useCallback(async (payload: RequeteSimulation) => {
-//     return await fetchAPI<ReponseSimulation>("/simulation", {
-//       method: "POST",
-//       body: JSON.stringify(payload),
-//     });
-//   }, []);
+  const lancerSimulation = useCallback(async (payload: RequeteSimulation) => {
+    return await api.post<ReponseSimulation>("/simulation", {...payload});
+  }, []);
 
   const resetErreur = () => setErreur(null);
 
@@ -105,7 +99,7 @@ const getMateriaux = useCallback(async () => {
     // erreur,
     getMateriaux,
     genererMaillage,
-    // lancerSimulation,
+    lancerSimulation,
     resetErreur,
   };
 }

@@ -9,6 +9,8 @@ import MaterialPanel from './panels/MaterialPanel';
 import SupportPanel from './panels/SupportPanel';
 import MeshPanel from './panels/MeshPanel';
 import { useWorkState } from '../../store/modules';
+import JobPanel from './panels/JobPanel';
+import LoadPanel from './panels/LoadPanel';
 
 export default function Rightbar() {
   const { getMateriaux } = useCalculs()
@@ -21,7 +23,6 @@ export default function Rightbar() {
   }, [])
 
   const model = useModel((s) => s);
-  console.log(model)
 
 
   const renderPanel = () => {
@@ -42,6 +43,14 @@ export default function Rightbar() {
       case 'mesh':
         return (
           <MeshPanel/>
+        );
+      case 'job':
+        return (
+          <JobPanel/>
+        );
+      case 'load':
+        return (
+          <LoadPanel/>
         );
       default:
         return <div className="p-4">Sélectionnez une étape</div>;

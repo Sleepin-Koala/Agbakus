@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type ReactNode } from "react";
+import  { useState, useEffect, type ReactNode } from "react";
 import type { IconType } from "react-icons";
 import { MdGridView, MdExpandMore, MdCheckCircle } from "react-icons/md";
 import { useModel } from "../../../store/models"; // Ajustez le chemin vers votre store si nécessaire
@@ -6,6 +6,7 @@ import { ActionButton } from "../components/actionInput";
 import type { MeshSettings } from "../../../types/mesh";
 import useCalculs, { type RequeteMaillage } from "../../../hooks/useCalculs";
 import { useWorkState } from "../../../store/modules";
+import { StoreMeshSettings } from "../../../store/states";
 
 /* ========================================================================== *
  * TYPES & CONSTANTES
@@ -178,15 +179,11 @@ export default function MeshPanel() {
   const { genererMaillage } = useCalculs()
 
   // État local du maillage synchronisé avec le store
-  const [meshSettings, setMeshSettings] = useState<MeshSettings>(
-    {
-      nx: 10,
-      ny: 10,
-      nz: 10,
-      n_theta: 12,
-      n_z: 10,
-    }
-  );
+
+  const meshSettingsStore = StoreMeshSettings((p)=>p)
+  const meshSettings = meshSettingsStore.MeshSettings
+  const setMeshSettings = meshSettingsStore.setMeshSettings
+
 
 
   const [quality] = useState<MeshQuality | null>({
@@ -202,13 +199,11 @@ export default function MeshPanel() {
   const WorkState = useWorkState((p) => p)
 
 
-  async function handleGenerate() {
+  async function handleRequestMaillage() {
     if (!type) return
     const r = { "geometrie": model.geometry, "maillage": meshSettings } as RequeteMaillage
     model.setMesh(await genererMaillage(r))
     setValid(true)
-
-
   }
 
   return (
@@ -221,7 +216,7 @@ export default function MeshPanel() {
         status: "Actif",
       }}
       footer={
-        <ActionButton icon={MdGridView} onClick={handleGenerate}>
+        <ActionButton icon={MdGridView} onClick={handleRequestMaillage}>
           Générer le maillage
         </ActionButton>
       }
@@ -255,7 +250,7 @@ export default function MeshPanel() {
               <NumberField
                 id="mesh-ntheta"
                 label="Divisions circonférentielles (n_theta)"
-                value={meshSettings.n_theta ?? 12}
+                value={meshSettings?.n_theta ?? 12}
                 min={3}
                 step={1}
                 onChange={(v) => updateMesh({ n_theta: v })}
@@ -263,7 +258,7 @@ export default function MeshPanel() {
               <NumberField
                 id="mesh-nz-cyl"
                 label="Divisions longitudinales (n_z)"
-                value={meshSettings.n_z ?? 10}
+                value={meshSettings?.n_z ?? 10}
                 min={1}
                 step={1}
                 onChange={(v) => updateMesh({ n_z: v })}
@@ -278,7 +273,7 @@ export default function MeshPanel() {
               <NumberField
                 id="mesh-nx"
                 label="Divisions selon X (nx)"
-                value={meshSettings.nx ?? 10}
+                value={meshSettings?.nx ?? 10}
                 min={1}
                 step={1}
                 onChange={(v) => updateMesh({ nx: v })}
@@ -286,7 +281,7 @@ export default function MeshPanel() {
               <NumberField
                 id="mesh-ny"
                 label="Divisions selon Y (ny)"
-                value={meshSettings.ny ?? 10}
+                value={meshSettings?.ny ?? 10}
                 min={1}
                 step={1}
                 onChange={(v) => updateMesh({ ny: v })}
@@ -294,7 +289,7 @@ export default function MeshPanel() {
               <NumberField
                 id="mesh-nz"
                 label="Divisions selon Z (nz)"
-                value={meshSettings.nz ?? 10}
+                value={meshSettings?.nz ?? 10}
                 min={1}
                 step={1}
                 onChange={(v) => updateMesh({ nz: v })}

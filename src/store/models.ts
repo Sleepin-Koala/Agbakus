@@ -35,10 +35,3 @@ export const useModel = create<ModelStore>((set) => ({
   setMesh : (mesh) => set({mesh}),
   clean: ()=>set({geometry: null , boundary: null , load : null , mesh : null , materiau: null})
 }))
-
-
-
-
-
-
-// pour le moment quand on fixe sur une face on applique sur lautre
