@@ -5,6 +5,7 @@ import { useModel } from "../../../store/models"; // Ajuste le chemin selon ton 
 import { StoreMeshSettings } from "../../../store/states";
 import api from "../../../api";
 import useCalculs, { type RequeteSimulation } from "../../../hooks/useCalculs";
+import { normalVersEncastrement, type Encastrement } from "../../../types/core";
 
 /* ========================================================================== *
  * COMPOSANT UI DE SECTION (Identique à SupportPanel)
@@ -77,11 +78,10 @@ function SummaryItem({
  * ========================================================================== */
 
 export default function JobPanel() {
-  const { geometry, materiau, boundary, load, clean } = useModel((p) => p);
+  const { geometry, materiau, boundary, load, clean  , setResult ,result , setMesh , mesh} = useModel((p) => p);
   const [isRunning, setIsRunning] = useState(false);
   const [jobSuccess, setJobSuccess] = useState(false);
-  const mesh = StoreMeshSettings((p)=>p.MeshSettings)
-
+  const meshsettings = StoreMeshSettings((p)=>p.MeshSettings)
 
   const {lancerSimulation} = useCalculs();
 
@@ -99,12 +99,12 @@ export default function JobPanel() {
   };
 
   const getMeshDetail = () => {
-    if (!mesh) return "Non généré";
-    if (mesh.nx && mesh.ny && mesh.nz) {
-      return `Cartésien (${mesh.nx} × ${mesh.ny} × ${mesh.nz})`;
+    if (!meshsettings) return "Non généré";
+    if (meshsettings.nx && meshsettings.ny && meshsettings.nz) {
+      return `Cartésien (${meshsettings.nx} × ${meshsettings.ny} × ${meshsettings.nz})`;
     }
-    if (mesh.n_theta && mesh.n_z) {
-      return `Cylindrique (θ: ${mesh.n_theta}, Z: ${mesh.n_z})`;
+    if (meshsettings.n_theta && meshsettings.n_z) {
+      return `Cylindrique (θ: ${meshsettings.n_theta}, Z: ${meshsettings.n_z})`;
     }
     return "Configuré";
   };
@@ -123,24 +123,55 @@ export default function JobPanel() {
   const configuredCount = [geometry, materiau, mesh, boundary, load].filter(Boolean).length;
   const isReady = configuredCount === 5;
 
-  // Lancement de la simulation
-  const handleRunSimulation = async () => {
-    if (!isReady || isRunning) return;
-    setIsRunning(true);
+// imports à ajouter (ajuste le chemin) :
+// import { normalVersEncastrement, type Encastrement } from "../../store/core";
 
-    try {
-      const payload = { materiau ,geometrie: {...geometry}, sollicitation : "compression" , charge : {valeur : load?.value , direction : "x"}, encastrement : {axe: "z" ,cote : 'max'} };
-      const res = await lancerSimulation(payload as RequeteSimulation)
-      console.log(res)
+const handleRunSimulation = async () => {
+  if (!isReady || isRunning || !geometry) return;
+  setIsRunning(true);
 
+  try {
+    // 1) Géométrie : on n'envoie que les champs du type choisi
+    const geometrie =
+      geometry.type === "pave"
+        ? { type: "pave", longueur: geometry.longueur, largeur: geometry.largeur, hauteur: geometry.hauteur }
+        : { type: "cylindre", rayon: geometry.rayon, hauteur: geometry.hauteur };
 
-      setJobSuccess(true);
-    } catch (error) {
-      console.error("Erreur lors du calcul :", error);
-    } finally {
-      setIsRunning(false);
+    // 2) Encastrement : normale de la face cliquée -> {axe, cote}
+    let encastrement: Encastrement = boundary
+      ? normalVersEncastrement(boundary.target)
+      : { axe: "z", cote: "min" };
+
+    // Le cylindre n'accepte que l'axe z (sinon erreur COMBINAISON_INVALIDE)
+    if (geometry.type === "cylindre") {
+      encastrement = { axe: "z", cote: encastrement.axe === "z" ? encastrement.cote : "min" };
     }
-  };
+
+    // 3) Charge : la direction n'est utile qu'en cisaillement
+    const sollicitation = "compression"; // TODO : à lire dans ton store quand il existera
+    const charge: { valeur: number; direction?: string } = { valeur: load!.value };
+    if (sollicitation === "cisaillement") {
+      charge.direction = encastrement.axe === "x" ? "y" : "x"; // doit différer de l'axe d'encastrement
+    }
+
+    const payload = {
+      geometrie,
+      ...(meshsettings && { maillage: meshsettings }), // même maillage que celui affiché
+      materiau,
+      sollicitation,
+      charge,
+      encastrement,
+    };
+
+    const res = await lancerSimulation(payload as RequeteSimulation);
+    setResult(res); // c'est tout : Mesh.tsx lit result
+    setJobSuccess(true);
+  } catch (error) {
+    console.error("Erreur lors du calcul :", error);
+  } finally {
+    setIsRunning(false);
+  }
+};
 
   return (
     <div className="flex max-w-sm flex-col gap-3 rounded border border-[#2a2c33] bg-amber-900 p-3 font-sans text-zinc-100">
