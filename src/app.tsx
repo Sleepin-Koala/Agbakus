@@ -9,7 +9,7 @@ export default function MainScreen() {
 
     return (
         <div className="flex flex-col h-screen w-screen">
-            <Upbar/>
+            {/* <Upbar/> */}
                 <div className="flex flex-1 min-h-0">
                     <Leftbar />
                     <Viewport/>

@@ -7,17 +7,6 @@ import { normalVersEncastrement, type Encastrement } from "../../../../types/cor
 import { SectionGroup } from "./components/SectionGroup";
 import { SummaryItem } from "./components/SummaryItem";
 
-/* ========================================================================== *
- * COMPOSANT UI DE SECTION (Identique à SupportPanel)
- * ========================================================================== */
-
-
-
-/* ========================================================================== *
- * LIGNE DE RÉSUMÉ D'UNE ÉTAPE
- * ========================================================================== */
-
-
 
 /* ========================================================================== *
  * COMPOSANT PRINCIPAL : JOB PANEL
@@ -94,11 +83,9 @@ const handleRunSimulation = async () => {
     }
 
     // 3) Charge : la direction n'est utile qu'en cisaillement
-    const sollicitation = "compression"; // TODO : à lire dans ton store quand il existera
+    const sollicitation = load?.sollicitation; // TODO : à lire dans ton store quand il existera
     const charge: { valeur: number; direction?: string } = { valeur: load!.value };
-    if (sollicitation == "cisaillement" as string) {
-      charge.direction = encastrement.axe === "x" ? "y" : "x"; // doit différer de l'axe d'encastrement
-    }
+
 
     const payload = {
       geometrie,

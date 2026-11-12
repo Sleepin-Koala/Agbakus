@@ -2,40 +2,19 @@ import * as React from "react";
 import { useState } from "react";
 import { MdCheckCircle, MdDeleteOutline } from "react-icons/md";
 import { useModel } from "../../../../store/models"; // Ajuste le chemin selon ton projet
+import { SectionGroup } from "./components/SectionGroup";
+import type { Sollicitation } from "../../../../types/load";
 
-/* ========================================================================== *
- * COMPOSANT UI DE SECTION
- * ========================================================================== */
-
-function SectionGroup({
-  title,
-  badge,
-  children,
-}: {
-  title: string;
-  badge?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded border border-[#2a2c33] bg-amber-900 p-3 text-amber-100">
-      <div className="mb-2 flex items-center justify-between border-b border-[#202227] pb-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300/80">
-          {title}
-        </span>
-        {badge ? (
-          <span className="rounded bg-amber-950 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
-            {badge}
-          </span>
-        ) : null}
-      </div>
-      <div className="space-y-3">{children}</div>
-    </div>
-  );
-}
 
 /* ========================================================================== *
  * COMPOSANT PRINCIPAL : LOAD PANEL
  * ========================================================================== */
+
+const SOLLICITATIONS: Array<{ id: Sollicitation; label: string; aide: string }> = [
+  { id: "traction", label: "Traction", aide: "Tire la face libre, le long de l'axe d'encastrement" },
+  { id: "compression", label: "Compression", aide: "Pousse la face libre vers l'encastrement" },
+  { id: "cisaillement", label: "Cisaillement", aide: "Fait glisser la face libre, perpendiculairement à l'encastrement" },
+];
 
 export default function LoadPanel() {
   const { load, setLoad } = useModel((p) => p);
@@ -47,6 +26,9 @@ export default function LoadPanel() {
     y: load?.target.y ?? -1,
     z: load?.target.z ?? 0,
   });
+
+  const [sollicitation, setSollicitation] = useState<Sollicitation>(load?.sollicitation ?? "traction");
+
   const [saved, setSaved] = useState<boolean>(false);
 
   const handleAxisChange = (axis: "x" | "y" | "z", rawValue: string) => {
@@ -61,6 +43,7 @@ export default function LoadPanel() {
     e.preventDefault();
     setLoad({
       type: "force",
+      sollicitation,
       value,
       target,
     });
@@ -69,7 +52,7 @@ export default function LoadPanel() {
   };
 
   const handleClear = () => {
-    setLoad({type: "force" , value : 0, target : {x: 0 , y:0 , z:0}});
+    setLoad({type: "force" ,sollicitation:"compression", value : 0, target : {x: 0 , y:0 , z:0}});
     setValue(1000);
     setTarget({ x: 0, y: 0, z: 1 });
   };
@@ -97,6 +80,32 @@ export default function LoadPanel() {
             placeholder="Ex: 1000"
           />
         </div>
+
+                {/* Type d'effort */}
+        <div className="flex flex-col gap-1">
+          <label className="text-[11px] font-medium text-amber-200/90">Type d'effort</label>
+          <div className="grid grid-cols-3 gap-1.5">
+            {SOLLICITATIONS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setSollicitation(s.id)}
+                className={
+                  "rounded border px-1.5 py-1.5 text-[11px] transition " +
+                  (sollicitation === s.id
+                    ? "border-amber-400 bg-amber-700 text-amber-50"
+                    : "border-amber-700 bg-amber-800 text-amber-100 hover:bg-amber-700")
+                }
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <span className="text-[10.5px] text-amber-200/70">
+            {SOLLICITATIONS.find((s) => s.id === sollicitation)?.aide}
+          </span>
+        </div>
+
 
         {/* Direction (Vector3D) */}
         <div className="flex flex-col gap-1">

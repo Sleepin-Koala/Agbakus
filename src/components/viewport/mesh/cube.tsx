@@ -52,7 +52,7 @@ export function CubeSimple({ X , Y , Z }: { X : number , Y : number ,Z: number})
     // Aucune rotation sur ce mesh : e.face.normal est donc déjà exprimée
     // dans le repère backend (utilisable directement pour l'encastrement).
     <mesh
-      position={[X / 2, Y / 2, Z / 2]} // origine
+      position={[0, 0 ,Z / 2]} // origine
       onClick={handleFaceClick}
       onPointerMove={onPointerMoves}
       onPointerOut={() => setHoveredFace(null)}

@@ -1,4 +1,3 @@
-const SERVER = "http://127.0.0.1:9888";
 
 // Classe d'erreur personnalisée avec typage du statut
 export class ApiError extends Error {
@@ -10,6 +9,18 @@ export class ApiError extends Error {
     this.name = "ApiError";
   }
 }
+
+declare global {
+  interface Window { api?: { backendUrl(): Promise<string> } }
+}
+
+const base = (await window.api?.backendUrl()) ?? "http://localhost:8000";
+
+const SERVER = base;
+
+console.log(base)
+
+// puis fetch(`${base}/simulation`, ...)
 
 // Interfaces pour le typage des requêtes
 interface RequestOptions {

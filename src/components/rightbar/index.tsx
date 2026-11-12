@@ -7,7 +7,7 @@ import SupportPanel from './panels/SupportPanel';
 import { useWorkState } from '../../store/modules';
 import JobPanel from './panels/JobPanel';
 import LoadPanel from './panels/LoadPanel/LoadPanel';
-import MeshPanel from './panels/MeshPanel/MeshPanel';
+import MeshPanel from './panels/MeshPanel';
 
 
 
@@ -18,7 +18,6 @@ export default function Rightbar() {
   useEffect(() => {
     getMateriaux()
   }, [])
-
 
   const renderPanel = () => {
     switch (WorkState.currentWorkState) {

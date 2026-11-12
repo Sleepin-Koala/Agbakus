@@ -243,7 +243,7 @@ export default function SupportPanel() {
         Sélectionner une face
       </HoldOnButton>
 
-      <ActionButton onClick={BoundaryConditionState.toogleActivation}>
+      <ActionButton onClick={BoundaryConditionState.desactiver}>
         ANNULER
       </ActionButton>
 

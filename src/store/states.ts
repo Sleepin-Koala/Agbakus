@@ -4,11 +4,13 @@ import type { MeshSettings } from "../types/mesh";
 interface BC {
     isActive : boolean
     toogleActivation : ()=>void
+    desactiver : ()=>void
 }
 
 export const SetSelectBoundaryConditions = create<BC>((set)=>({
     isActive : false,
-    toogleActivation : () => set((c)=> ({isActive : !c.isActive}))
+    toogleActivation : () => set((c)=> ({isActive : !c.isActive})),
+    desactiver : () => set({isActive : false})
 }))
 
 
@@ -24,3 +26,4 @@ export const StoreMeshSettings = create<InterMeshSettings>((set)=>({
     setMeshSettings : (MeshSettings : MeshSettings) => set({MeshSettings})
 }))
  
+

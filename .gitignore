@@ -1,1 +1,8 @@
 node_modules
+.gitignore
+out
+build
+dist-backend
+*.spec
+*.pyc
+*.json

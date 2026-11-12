@@ -2,7 +2,7 @@ import { FaWindowMinimize ,FaRegWindowRestore   } from "react-icons/fa6"
 import {FaWindowClose} from "react-icons/fa"
 
 
-export default function mainBar() {
+export default function upBar() {
 
   return (
         <div className="flex  bg-blue-500 h-7.5">

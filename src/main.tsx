@@ -5,10 +5,7 @@ import App from "./app"
 
 
 async function main() {
-  if (import.meta.env.DEV) {
-    const { worker } = await import("./mocks/browser");
-    await worker.start();
-  }
+
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
